@@ -94,6 +94,8 @@ typedef NS_ENUM(NSUInteger, _SRRecorderControlButtonTag)
 
     CGFloat _shapeXRadius;
     CGFloat _shapeYRadious;
+    
+    BOOL _darkMode;
 }
 
 - (instancetype)initWithFrame:(NSRect)aFrameRect
@@ -120,6 +122,11 @@ typedef NS_ENUM(NSUInteger, _SRRecorderControlButtonTag)
     _mouseTrackingButtonTag = _SRRecorderControlInvalidButtonTag;
     _snapBackButtonToolTipTag = NSIntegerMax;
 
+    [[NSUserDefaults standardUserDefaults] addObserver:self forKeyPath:@"AppleInterfaceStyle" options:0 context:nil];
+
+    NSString *osxMode = [[NSUserDefaults standardUserDefaults] stringForKey:@"AppleInterfaceStyle"];
+    _darkMode = [[osxMode lowercaseString] isEqualToString:@"dark"];
+    
     if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_6)
     {
         self.translatesAutoresizingMaskIntoConstraints = NO;
@@ -148,6 +155,21 @@ typedef NS_ENUM(NSUInteger, _SRRecorderControlButtonTag)
 
     [self setToolTip:SRLoc(@"Click to record shortcut")];
     [self updateTrackingAreas];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+    NSString *osxMode = [[NSUserDefaults standardUserDefaults] stringForKey:@"AppleInterfaceStyle"];
+    BOOL darkMode = [[osxMode lowercaseString] isEqualToString:@"dark"];
+    
+    if(darkMode != _darkMode){
+        _darkMode = darkMode;
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self updateBackingImages];
+            [self setNeedsDisplay:YES];
+        });
+    }
 }
 
 - (void)dealloc
@@ -465,7 +487,7 @@ typedef NS_ENUM(NSUInteger, _SRRecorderControlButtonTag)
 {
     if (self.enabled)
     {
-        if (self.isRecording)
+        if (self.isRecording || (_darkMode && self.isMainButtonHighlighted))
             return [self recordingLabelAttributes];
         else
             return [self normalLabelAttributes];
@@ -478,16 +500,17 @@ typedef NS_ENUM(NSUInteger, _SRRecorderControlButtonTag)
 {
     static dispatch_once_t OnceToken;
     static NSDictionary *NormalAttributes = nil;
+
     dispatch_once(&OnceToken, ^{
         NSMutableParagraphStyle *p = [[NSMutableParagraphStyle alloc] init];
         p.alignment = NSCenterTextAlignment;
         p.lineBreakMode = NSLineBreakByTruncatingTail;
         p.baseWritingDirection = NSWritingDirectionLeftToRight;
         NormalAttributes = @{
-            NSParagraphStyleAttributeName: [p copy],
-            NSFontAttributeName: [NSFont labelFontOfSize:[NSFont systemFontSize]],
-            NSForegroundColorAttributeName: [NSColor controlTextColor]
-        };
+                             NSParagraphStyleAttributeName: [p copy],
+                             NSFontAttributeName: [NSFont labelFontOfSize:[NSFont systemFontSize]],
+                             NSForegroundColorAttributeName: [NSColor controlTextColor]
+                             };
     });
     return NormalAttributes;
 }
@@ -979,36 +1002,52 @@ typedef NS_ENUM(NSUInteger, _SRRecorderControlButtonTag)
     return YES;
 }
 
-- (void)viewWillDraw
-{
-    [super viewWillDraw];
-
-    static dispatch_once_t OnceToken;
-    dispatch_once(&OnceToken, ^{
-        if (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_9)
-        {
-            _SRImages[0] = SRImage(@"shortcut-recorder-bezel-blue-highlighted-left");
-            _SRImages[1] = SRImage(@"shortcut-recorder-bezel-blue-highlighted-middle");
-            _SRImages[2] = SRImage(@"shortcut-recorder-bezel-blue-highlighted-right");
-            _SRImages[3] = SRImage(@"shortcut-recorder-bezel-editing-left");
-            _SRImages[4] = SRImage(@"shortcut-recorder-bezel-editing-middle");
-            _SRImages[5] = SRImage(@"shortcut-recorder-bezel-editing-right");
-            _SRImages[6] = SRImage(@"shortcut-recorder-bezel-graphite-highlight-mask-left");
-            _SRImages[7] = SRImage(@"shortcut-recorder-bezel-graphite-highlight-mask-middle");
-            _SRImages[8] = SRImage(@"shortcut-recorder-bezel-graphite-highlight-mask-right");
-            _SRImages[9] = SRImage(@"shortcut-recorder-bezel-left");
-            _SRImages[10] = SRImage(@"shortcut-recorder-bezel-middle");
-            _SRImages[11] = SRImage(@"shortcut-recorder-bezel-right");
-            _SRImages[12] = SRImage(@"shortcut-recorder-clear-highlighted");
-            _SRImages[13] = SRImage(@"shortcut-recorder-clear");
-            _SRImages[14] = SRImage(@"shortcut-recorder-snapback-highlighted");
-            _SRImages[15] = SRImage(@"shortcut-recorder-snapback");
-            _SRImages[16] = SRImage(@"shortcut-recorder-bezel-disabled-left");
-            _SRImages[17] = SRImage(@"shortcut-recorder-bezel-disabled-middle");
-            _SRImages[18] = SRImage(@"shortcut-recorder-bezel-disabled-right");
-        }
-        else
-        {
+-(void) updateBackingImages{
+    if (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_9)
+    {
+        _SRImages[0] = SRImage(@"shortcut-recorder-bezel-blue-highlighted-left");
+        _SRImages[1] = SRImage(@"shortcut-recorder-bezel-blue-highlighted-middle");
+        _SRImages[2] = SRImage(@"shortcut-recorder-bezel-blue-highlighted-right");
+        _SRImages[3] = SRImage(@"shortcut-recorder-bezel-editing-left");
+        _SRImages[4] = SRImage(@"shortcut-recorder-bezel-editing-middle");
+        _SRImages[5] = SRImage(@"shortcut-recorder-bezel-editing-right");
+        _SRImages[6] = SRImage(@"shortcut-recorder-bezel-graphite-highlight-mask-left");
+        _SRImages[7] = SRImage(@"shortcut-recorder-bezel-graphite-highlight-mask-middle");
+        _SRImages[8] = SRImage(@"shortcut-recorder-bezel-graphite-highlight-mask-right");
+        _SRImages[9] = SRImage(@"shortcut-recorder-bezel-left");
+        _SRImages[10] = SRImage(@"shortcut-recorder-bezel-middle");
+        _SRImages[11] = SRImage(@"shortcut-recorder-bezel-right");
+        _SRImages[12] = SRImage(@"shortcut-recorder-clear-highlighted");
+        _SRImages[13] = SRImage(@"shortcut-recorder-clear");
+        _SRImages[14] = SRImage(@"shortcut-recorder-snapback-highlighted");
+        _SRImages[15] = SRImage(@"shortcut-recorder-snapback");
+        _SRImages[16] = SRImage(@"shortcut-recorder-bezel-disabled-left");
+        _SRImages[17] = SRImage(@"shortcut-recorder-bezel-disabled-middle");
+        _SRImages[18] = SRImage(@"shortcut-recorder-bezel-disabled-right");
+    }
+    else
+    {
+        if(_darkMode){
+            _SRImages[0] = SRImage(@"shortcut-recorder-mojave-dark-bezel-blue-highlighted-left");
+            _SRImages[1] = SRImage(@"shortcut-recorder-mojave-dark-bezel-blue-highlighted-middle");
+            _SRImages[2] = SRImage(@"shortcut-recorder-mojave-dark-bezel-blue-highlighted-right");
+            _SRImages[3] = SRImage(@"shortcut-recorder-mojave-dark-bezel-editing-left");
+            _SRImages[4] = SRImage(@"shortcut-recorder-mojave-dark-bezel-editing-middle");
+            _SRImages[5] = SRImage(@"shortcut-recorder-mojave-dark-bezel-editing-right");
+            _SRImages[6] = SRImage(@"shortcut-recorder-mojave-dark-bezel-graphite-highlight-mask-left");
+            _SRImages[7] = SRImage(@"shortcut-recorder-mojave-dark-bezel-graphite-highlight-mask-middle");
+            _SRImages[8] = SRImage(@"shortcut-recorder-mojave-dark-bezel-graphite-highlight-mask-right");
+            _SRImages[9] = SRImage(@"shortcut-recorder-mojave-dark-bezel-left");
+            _SRImages[10] = SRImage(@"shortcut-recorder-mojave-dark-bezel-middle");
+            _SRImages[11] = SRImage(@"shortcut-recorder-mojave-dark-bezel-right");
+            _SRImages[12] = SRImage(@"shortcut-recorder-mojave-dark-clear-highlighted");
+            _SRImages[13] = SRImage(@"shortcut-recorder-mojave-dark-clear");
+            _SRImages[14] = SRImage(@"shortcut-recorder-mojave-dark-snapback-highlighted");
+            _SRImages[15] = SRImage(@"shortcut-recorder-mojave-dark-snapback");
+            _SRImages[16] = SRImage(@"shortcut-recorder-mojave-dark-bezel-disabled-left");
+            _SRImages[17] = SRImage(@"shortcut-recorder-mojave-dark-bezel-disabled-middle");
+            _SRImages[18] = SRImage(@"shortcut-recorder-mojave-dark-bezel-disabled-right");
+        }else{
             _SRImages[0] = SRImage(@"shortcut-recorder-yosemite-bezel-blue-highlighted-left");
             _SRImages[1] = SRImage(@"shortcut-recorder-yosemite-bezel-blue-highlighted-middle");
             _SRImages[2] = SRImage(@"shortcut-recorder-yosemite-bezel-blue-highlighted-right");
@@ -1029,6 +1068,16 @@ typedef NS_ENUM(NSUInteger, _SRRecorderControlButtonTag)
             _SRImages[17] = SRImage(@"shortcut-recorder-yosemite-bezel-disabled-middle");
             _SRImages[18] = SRImage(@"shortcut-recorder-yosemite-bezel-disabled-right");
         }
+    }
+}
+
+- (void)viewWillDraw
+{
+    [super viewWillDraw];
+
+    static dispatch_once_t OnceToken;
+    dispatch_once(&OnceToken, ^{
+        [self updateBackingImages];
     });
 }
 
