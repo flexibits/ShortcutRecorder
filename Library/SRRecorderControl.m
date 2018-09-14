@@ -94,8 +94,6 @@ typedef NS_ENUM(NSUInteger, _SRRecorderControlButtonTag)
 
     CGFloat _shapeXRadius;
     CGFloat _shapeYRadious;
-    
-    BOOL _darkMode;
 }
 
 - (instancetype)initWithFrame:(NSRect)aFrameRect
@@ -121,11 +119,6 @@ typedef NS_ENUM(NSUInteger, _SRRecorderControlButtonTag)
     _requiredModifierFlags = 0;
     _mouseTrackingButtonTag = _SRRecorderControlInvalidButtonTag;
     _snapBackButtonToolTipTag = NSIntegerMax;
-
-    [[NSUserDefaults standardUserDefaults] addObserver:self forKeyPath:@"AppleInterfaceStyle" options:0 context:nil];
-
-    NSString *osxMode = [[NSUserDefaults standardUserDefaults] stringForKey:@"AppleInterfaceStyle"];
-    _darkMode = [[osxMode lowercaseString] isEqualToString:@"dark"];
     
     if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_6)
     {
@@ -155,21 +148,6 @@ typedef NS_ENUM(NSUInteger, _SRRecorderControlButtonTag)
 
     [self setToolTip:SRLoc(@"Click to record shortcut")];
     [self updateTrackingAreas];
-}
-
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
-{
-    NSString *osxMode = [[NSUserDefaults standardUserDefaults] stringForKey:@"AppleInterfaceStyle"];
-    BOOL darkMode = [[osxMode lowercaseString] isEqualToString:@"dark"];
-    
-    if(darkMode != _darkMode){
-        _darkMode = darkMode;
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self updateBackingImages];
-            [self setNeedsDisplay:YES];
-        });
-    }
 }
 
 - (void)dealloc
@@ -487,7 +465,7 @@ typedef NS_ENUM(NSUInteger, _SRRecorderControlButtonTag)
 {
     if (self.enabled)
     {
-        if (self.isRecording || (_darkMode && self.isMainButtonHighlighted))
+        if (self.isRecording || ([self useDarkMode] && self.isMainButtonHighlighted))
             return [self recordingLabelAttributes];
         else
             return [self normalLabelAttributes];
@@ -551,6 +529,14 @@ typedef NS_ENUM(NSUInteger, _SRRecorderControlButtonTag)
     return DisabledAttributes;
 }
 
+- (BOOL)useDarkMode
+{
+    if (@available(macOS 10.14, *)) {
+        return [[self effectiveAppearance] isEqual:[NSAppearance appearanceNamed:NSAppearanceNameDarkAqua]];
+    }
+
+    return NO;
+}
 
 #pragma mark -
 
@@ -1027,7 +1013,7 @@ typedef NS_ENUM(NSUInteger, _SRRecorderControlButtonTag)
     }
     else
     {
-        if(_darkMode){
+        if([self useDarkMode]){
             _SRImages[0] = SRImage(@"shortcut-recorder-mojave-dark-bezel-blue-highlighted-left");
             _SRImages[1] = SRImage(@"shortcut-recorder-mojave-dark-bezel-blue-highlighted-middle");
             _SRImages[2] = SRImage(@"shortcut-recorder-mojave-dark-bezel-blue-highlighted-right");
@@ -1069,6 +1055,14 @@ typedef NS_ENUM(NSUInteger, _SRRecorderControlButtonTag)
             _SRImages[18] = SRImage(@"shortcut-recorder-yosemite-bezel-disabled-right");
         }
     }
+}
+
+- (void)viewDidChangeEffectiveAppearance
+{
+    [super viewDidChangeEffectiveAppearance];
+
+    [self updateBackingImages];
+    [self setNeedsDisplay:YES];
 }
 
 - (void)viewWillDraw
