@@ -1,0 +1,39 @@
+/* (No Comment) */
+"Click to record shortcut" = "Registar atalho";
+
+/* (No Comment) */
+"Command-" = "Command-";
+
+/* (No Comment) */
+"Control-" = "Control-";
+
+/* (No Comment) */
+"Option-" = "Option-";
+
+/* (No Comment) */
+"Pad %@" = "Pad %@";
+
+/* (No Comment) */
+"Shift-" = "Shift-";
+
+/* (No Comment) */
+"Space" = "Espaço";
+
+/* (No Comment) */
+"The key combination \"%@\" can't be used because %@." = "A combinação de teclas \"%@\" não pode ser utilizada porque %@@.";
+
+/* (No Comment) */
+"The key combination \"%@\" can't be used because it's already used by a system-wide keyboard shortcut. If you really want to use this key combination, most shortcuts can be changed in the Keyboard panel in System Preferences." = "A combinação de teclas \"%@\" não pode ser utilizada porque já é utilizada por um atalho de teclado do sistema. Se realmente quiser utilizar esta combinação de teclas, a maioria dos atalhos pode ser alterada no painel do Teclado em Preferências do Sistema.";
+
+/* (No Comment) */
+"The key combination \"%@\" can't be used because it's already used by the menu item \"%@\"." = "A combinação de teclas \"%@\" não pode ser utilizada porque já é utilizada pelo item de menu \"%@\".";
+
+/* (No Comment) */
+"The key combination \"%@\" can't be used!" = "A combinação de teclas \"%@\" não pode ser usada!";
+
+/* (No Comment) */
+"Type shortcut" = "Escreva atalho";
+
+/* (No Comment) */
+"Use old shortcut" = "Use o atalho antigo";
+
