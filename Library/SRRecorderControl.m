@@ -82,6 +82,8 @@ typedef NS_ENUM(NSUInteger, _SRRecorderControlButtonTag)
     _SRRecorderControlMainButtonTag = 2
 };
 
+@interface SRRecorderControl () <NSAccessibility, NSViewToolTipOwner>
+@end
 
 @implementation SRRecorderControl
 {
@@ -146,6 +148,11 @@ typedef NS_ENUM(NSUInteger, _SRRecorderControlButtonTag)
         _shapeYRadious = _SRRecorderControlYosemiteShapeYRadius;
     }
 
+    [self setAccessibilityElement:YES];
+    [self setAccessibilityRole:NSAccessibilityButtonRole];
+    [self setAccessibilityTitle:[self accessibilityLabel]];
+    [self setAccessibilityEnabled:YES];
+
     [self setToolTip:SRLoc(@"Click to record shortcut")];
     [self updateTrackingAreas];
 }
@@ -193,6 +200,8 @@ typedef NS_ENUM(NSUInteger, _SRRecorderControlButtonTag)
     // Focus ring is only drawn when view is enabled
     if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_6)
         [self noteFocusRingMaskChanged];
+
+    [self setAccessibilityEnabled:_enabled];
 }
 
 - (void)setObjectValue:(NSDictionary *)newObjectValue
@@ -845,102 +854,44 @@ typedef NS_ENUM(NSUInteger, _SRRecorderControlButtonTag)
 
 #pragma mark NSAccessibility
 
-- (BOOL)accessibilityIsIgnored
+- (BOOL)accessibilityPerformPress
 {
-    return NO;
+    [self beginRecording];
+
+    return YES;
 }
 
-- (NSArray *)accessibilityAttributeNames
+- (BOOL)accessibilityPerformCancel
 {
-    static NSArray *AttributeNames = nil;
-    static dispatch_once_t OnceToken;
-    dispatch_once(&OnceToken, ^
-    {
-        AttributeNames = [[super accessibilityAttributeNames] mutableCopy];
-        NSArray *newAttributes = @[
-            NSAccessibilityRoleAttribute,
-            NSAccessibilityTitleAttribute,
-            NSAccessibilityEnabledAttribute
-        ];
-
-        for (NSString *attributeName in newAttributes)
-        {
-            if (![AttributeNames containsObject:attributeName])
-                [(NSMutableArray *)AttributeNames addObject:attributeName];
-        }
-
-        AttributeNames = [AttributeNames copy];
-    });
-    return AttributeNames;
-}
-
-- (id)accessibilityAttributeValue:(NSString *)anAttributeName
-{
-    if ([anAttributeName isEqualToString:NSAccessibilityRoleAttribute])
-        return NSAccessibilityButtonRole;
-    else if ([anAttributeName isEqualToString:NSAccessibilityTitleAttribute])
-        return self.accessibilityLabel;
-    else if ([anAttributeName isEqualToString:NSAccessibilityEnabledAttribute])
-        return @(self.enabled);
-    else
-        return [super accessibilityAttributeValue:anAttributeName];
-}
-
-- (NSArray *)accessibilityActionNames
-{
-    static NSArray *AllActions = nil;
-    static NSArray *ButtonStateActionNames = nil;
-    static NSArray *RecorderStateActionNames = nil;
-
-    static dispatch_once_t OnceToken;
-    dispatch_once(&OnceToken, ^
-    {
-        AllActions = @[
-            NSAccessibilityPressAction,
-            NSAccessibilityCancelAction,
-            NSAccessibilityDeleteAction
-        ];
-
-        ButtonStateActionNames = @[
-            NSAccessibilityPressAction
-        ];
-
-        RecorderStateActionNames = @[
-            NSAccessibilityCancelAction,
-            NSAccessibilityDeleteAction
-        ];
-    });
-
-    // List of supported actions names must be fixed for 10.6, but can vary for 10.7 and above.
-    if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_6)
-    {
-        if (self.enabled)
-        {
-            if (self.isRecording)
-                return RecorderStateActionNames;
-            else
-                return ButtonStateActionNames;
-        }
-        else
-            return @[];
-    }
-    else
-        return AllActions;
-}
-
-- (NSString *)accessibilityActionDescription:(NSString *)anAction
-{
-    return NSAccessibilityActionDescription(anAction);
-}
-
-- (void)accessibilityPerformAction:(NSString *)anAction
-{
-    if ([anAction isEqualToString:NSAccessibilityPressAction])
-        [self beginRecording];
-    else if (self.isRecording && [anAction isEqualToString:NSAccessibilityCancelAction])
+    if (self.isRecording) {
         [self endRecording];
-    else if (self.isRecording && [anAction isEqualToString:NSAccessibilityDeleteAction])
+    }
+
+    return self.isRecording;
+}
+
+- (BOOL)accessibilityPerformDelete
+{
+    if (self.isRecording) {
         [self clearAndEndRecording];
+    }
+
+    return self.isRecording;
+}
+
+- (BOOL)isAccessibilitySelectorAllowed:(SEL)selector
+{
+    BOOL allowed = NO;
+
+    if (selector == @selector(accessibilityPerformPress)) {
+        allowed = self.enabled;
+    } else if (selector == @selector(accessibilityPerformCancel)) {
+        allowed = self.isRecording;
+    } else if (selector == @selector(accessibilityPerformDelete)) {
+        allowed = self.isRecording;
+    }
+
+    return allowed;
 }
 
 
