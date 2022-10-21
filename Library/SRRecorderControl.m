@@ -881,17 +881,20 @@ typedef NS_ENUM(NSUInteger, _SRRecorderControlButtonTag)
 
 - (BOOL)isAccessibilitySelectorAllowed:(SEL)selector
 {
-    BOOL allowed = NO;
+    // This method asks us which accessibility selector are allowed. We need
+    // to limit some of these based on whether we're recording. However, all
+    // other selectors should return the default result (otherwise we might
+    // block `accessibilityLabel`).
 
     if (selector == @selector(accessibilityPerformPress)) {
-        allowed = self.enabled;
+        return self.enabled;
     } else if (selector == @selector(accessibilityPerformCancel)) {
-        allowed = self.isRecording;
+        return self.isRecording;
     } else if (selector == @selector(accessibilityPerformDelete)) {
-        allowed = self.isRecording;
+        return self.isRecording;
     }
 
-    return allowed;
+    return YES;
 }
 
 
