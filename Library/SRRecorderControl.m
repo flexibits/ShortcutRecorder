@@ -150,7 +150,6 @@ typedef NS_ENUM(NSUInteger, _SRRecorderControlButtonTag)
 
     [self setAccessibilityElement:YES];
     [self setAccessibilityRole:NSAccessibilityButtonRole];
-    [self setAccessibilityTitle:[self accessibilityLabel]];
     [self setAccessibilityEnabled:YES];
 
     [self setToolTip:SRLoc(@"Click to record shortcut")];
@@ -429,6 +428,11 @@ typedef NS_ENUM(NSUInteger, _SRRecorderControlButtonTag)
     }
 
     return label;
+}
+
+- (NSString *)accessibilityTitle
+{
+    return [self accessibilityLabel];
 }
 
 - (NSString *)stringValue
