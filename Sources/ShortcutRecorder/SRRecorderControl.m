@@ -891,10 +891,21 @@ static void *_SRStyleGuideObservingContext = &_SRStyleGuideObservingContext;
     return allowModifierFlags;
 }
 
+- (BOOL)isRunningOnSequoia {
+    if( @available(macOS 15.0, *) ) {
+        return YES;
+    } else {
+        return NO;
+    }
+}
+
 - (BOOL)areModifierFlagsAllowed:(NSEventModifierFlags)aModifierFlags forKeyCode:(SRKeyCode)aKeyCode
 {
     aModifierFlags &= SRCocoaModifierFlagsMask;
     __block BOOL allowModifierFlags = YES;
+    if( [self isRunningOnSequoia] && ![SRShortcut sequoiaValidModifiers:aModifierFlags]) {
+        return FALSE;
+    }
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
@@ -1045,7 +1056,11 @@ static void *_SRStyleGuideObservingContext = &_SRStyleGuideObservingContext;
 #pragma clang diagnostic pop
 
     os_activity_initiate("-[SRRecorderControl canEndRecordingWithObjectValue:]", OS_ACTIVITY_FLAG_DEFAULT, ^{
-        if ([self areModifierFlagsValid:aShortcut.modifierFlags forKeyCode:aShortcut.keyCode])
+        if( [self isRunningOnSequoia] && ![SRShortcut sequoiaValidModifiers:aShortcut.modifierFlags] ) {
+            os_log_debug(OS_LOG_DEFAULT, "Sequoia rejected");
+            result = NO;
+        }
+        else if ([self areModifierFlagsValid:aShortcut.modifierFlags forKeyCode:aShortcut.keyCode])
         {
             if (DelegateCanRecordShortcut(aShortcut))
             {
