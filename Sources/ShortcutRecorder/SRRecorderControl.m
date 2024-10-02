@@ -64,6 +64,8 @@ static void *_SRStyleGuideObservingContext = &_SRStyleGuideObservingContext;
 
     // Controls intrinsic width of the label.
     NSLayoutConstraint *_labelWidthConstraint;
+    
+    BOOL _hasSequoiaAlertBeenShown;
 }
 
 - (instancetype)initWithFrame:(NSRect)aFrameRect
@@ -91,6 +93,7 @@ static void *_SRStyleGuideObservingContext = &_SRStyleGuideObservingContext;
     _cancelButtonToolTipTag = NSIntegerMax;
     _clearButtonToolTipTag = NSIntegerMax;
     _pausesGlobalShortcutMonitorWhileRecording = YES;
+    _hasSequoiaAlertBeenShown = NO;
 
     _notifyStyle = [NSInvocation invocationWithMethodSignature:[SRRecorderControlStyle instanceMethodSignatureForSelector:@selector(recorderControlAppearanceDidChange:)]];
     _notifyStyle.selector = @selector(recorderControlAppearanceDidChange:);
@@ -1779,6 +1782,10 @@ static void *_SRStyleGuideObservingContext = &_SRStyleGuideObservingContext;
                     [self endRecordingWithObjectValue:newObjectValue];
                 else
                 {
+                    if( [self isRunningOnSequoia] && ![newObjectValue isValidOnSequoia] && !_hasSequoiaAlertBeenShown) {
+                        [[NSAlert alertWithMessageText:@"Not valid on Sequoia" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Sequoia cannot use a shortcut with just opt or shift as modifiers.  Opt and shift are valid, but must be combined with cmd or ctrl."] runModal];
+                        _hasSequoiaAlertBeenShown = YES;
+                    }
                     // Do not end editing and allow the client to make another attempt.
                     [self playAlert];
                 }
