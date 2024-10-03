@@ -891,6 +891,18 @@ static void *_SRStyleGuideObservingContext = &_SRStyleGuideObservingContext;
     return allowModifierFlags;
 }
 
+- (BOOL)isRunningOnSequoia
+{
+    if (@available(macOS 15.0, *))
+    {
+        return YES;
+    }
+    else
+    {
+        return NO;
+    }
+}
+
 - (BOOL)areModifierFlagsAllowed:(NSEventModifierFlags)aModifierFlags forKeyCode:(SRKeyCode)aKeyCode
 {
     aModifierFlags &= SRCocoaModifierFlagsMask;
@@ -913,7 +925,11 @@ static void *_SRStyleGuideObservingContext = &_SRStyleGuideObservingContext;
 #pragma clang diagnostic pop
 
     os_activity_initiate("-[SRRecorderControl areModifierFlagsAllowed:forKeyCode:]", OS_ACTIVITY_FLAG_IF_NONE_PRESENT, ^{
-        if ((aModifierFlags == 0 && !self.allowsEmptyModifierFlags) ||
+        if ([self isRunningOnSequoia] && ![SRShortcut sequoiaValidModifiers:aModifierFlags])
+        {
+            allowModifierFlags = NO;
+        }
+        else if ((aModifierFlags == 0 && !self.allowsEmptyModifierFlags) ||
             ((aModifierFlags & self.allowedModifierFlags) != aModifierFlags))
         {
             allowModifierFlags = DelegateShouldUnconditionallyAllowModifierFlags();
