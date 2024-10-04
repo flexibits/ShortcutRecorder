@@ -64,6 +64,11 @@ static void *_SRStyleGuideObservingContext = &_SRStyleGuideObservingContext;
 
     // Controls intrinsic width of the label.
     NSLayoutConstraint *_labelWidthConstraint;
+    
+    // We dont want to show the alert every time if the modifiers
+    // are not compatible with Sequoia, so track if this instance of
+    // the control has shown it already
+    BOOL _hasSequoiaAlertBeenShown;
 }
 
 - (instancetype)initWithFrame:(NSRect)aFrameRect
@@ -91,6 +96,7 @@ static void *_SRStyleGuideObservingContext = &_SRStyleGuideObservingContext;
     _cancelButtonToolTipTag = NSIntegerMax;
     _clearButtonToolTipTag = NSIntegerMax;
     _pausesGlobalShortcutMonitorWhileRecording = YES;
+    _hasSequoiaAlertBeenShown = NO;
 
     _notifyStyle = [NSInvocation invocationWithMethodSignature:[SRRecorderControlStyle instanceMethodSignatureForSelector:@selector(recorderControlAppearanceDidChange:)]];
     _notifyStyle.selector = @selector(recorderControlAppearanceDidChange:);
@@ -944,6 +950,17 @@ static void *_SRStyleGuideObservingContext = &_SRStyleGuideObservingContext;
     NSBeep();
 }
 
+- (void)showSequoiaAlert
+{
+    NSAlert *sequoiaAlert = [[NSAlert alloc] init];
+    
+    [sequoiaAlert setMessageText:SRLoc(@"Shortcut not valid")];
+    [sequoiaAlert setInformativeText:SRLoc(@"Shortcuts must include the command or control key. Shortcuts with only option or shift are not allowed by macOS.")];
+    [sequoiaAlert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse returnCode) {
+        self->_hasSequoiaAlertBeenShown = YES;
+    }];
+}
+
 - (void)propagateValue:(id)aValue forBinding:(NSString *)aBinding
 {
     NSParameterAssert(aBinding != nil);
@@ -1061,7 +1078,12 @@ static void *_SRStyleGuideObservingContext = &_SRStyleGuideObservingContext;
 #pragma clang diagnostic pop
 
     os_activity_initiate("-[SRRecorderControl canEndRecordingWithObjectValue:]", OS_ACTIVITY_FLAG_DEFAULT, ^{
-        if ([self areModifierFlagsValid:aShortcut.modifierFlags forKeyCode:aShortcut.keyCode])
+        if ([self isRunningOnSequoia] && ![SRShortcut sequoiaValidModifiers:aShortcut.modifierFlags])
+        {
+            os_log_debug(OS_LOG_DEFAULT, "Modifiers %lu rejected on Sequoia", aShortcut.modifierFlags);
+            result = NO;
+        }
+        else if ([self areModifierFlagsValid:aShortcut.modifierFlags forKeyCode:aShortcut.keyCode])
         {
             if (DelegateCanRecordShortcut(aShortcut))
             {
@@ -1782,6 +1804,9 @@ static void *_SRStyleGuideObservingContext = &_SRStyleGuideObservingContext;
                 {
                     // Do not end editing and allow the client to make another attempt.
                     [self playAlert];
+
+                    if ([self isRunningOnSequoia] && ![newObjectValue isValidOnSequoia] && !_hasSequoiaAlertBeenShown)
+                        [self showSequoiaAlert];
                 }
 
                 result = YES;
