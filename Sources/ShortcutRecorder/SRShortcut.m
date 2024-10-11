@@ -208,7 +208,7 @@ SRShortcutKey const SRShortcutKeyCharactersIgnoringModifiers = @"charactersIgnor
 + (BOOL)macos15ValidModifiers:(NSEventModifierFlags)modifierFlags
 {
     BOOL noModifiers = (modifierFlags == 0);
-    BOOL hasCtrlOrCommand = (modifierFlags & (NSEventModifierFlagControl|NSEventModifierFlagCommand));
+    BOOL hasCtrlOrCommand = ((modifierFlags & (NSEventModifierFlagControl|NSEventModifierFlagCommand)) != 0);
     
     return noModifiers || hasCtrlOrCommand;
 }
