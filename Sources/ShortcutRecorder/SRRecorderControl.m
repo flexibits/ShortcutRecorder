@@ -897,7 +897,7 @@ static void *_SRStyleGuideObservingContext = &_SRStyleGuideObservingContext;
     return allowModifierFlags;
 }
 
-- (BOOL)isRunningOnSequoia
+- (BOOL)isAtLeastMacOS15
 {
     if (@available(macOS 15.0, *))
     {
@@ -931,7 +931,7 @@ static void *_SRStyleGuideObservingContext = &_SRStyleGuideObservingContext;
 #pragma clang diagnostic pop
 
     os_activity_initiate("-[SRRecorderControl areModifierFlagsAllowed:forKeyCode:]", OS_ACTIVITY_FLAG_IF_NONE_PRESENT, ^{
-        if ([self isRunningOnSequoia] && ![SRShortcut sequoiaValidModifiers:aModifierFlags])
+        if ([self isAtLeastMacOS15] && ![SRShortcut macos15ValidModifiers:aModifierFlags])
         {
             allowModifierFlags = NO;
         }
@@ -954,8 +954,8 @@ static void *_SRStyleGuideObservingContext = &_SRStyleGuideObservingContext;
 {
     NSAlert *sequoiaAlert = [[NSAlert alloc] init];
     
-    [sequoiaAlert setMessageText:SRLoc(@"Shortcut not valid")];
-    [sequoiaAlert setInformativeText:SRLoc(@"Shortcuts must include the command or control key. Shortcuts with only option or shift are not allowed by macOS.")];
+    [sequoiaAlert setMessageText:SRLoc(@"Keyboard shortcut not allowed")];
+    [sequoiaAlert setInformativeText:SRLoc(@"Keyboard shortcuts must include the Command or Control keys. Keyboard shortcuts with only the Option or Shift keys are not allowed by macOS.")];
     [sequoiaAlert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse returnCode) {
         self->_hasSequoiaAlertBeenShown = YES;
     }];
@@ -1078,7 +1078,7 @@ static void *_SRStyleGuideObservingContext = &_SRStyleGuideObservingContext;
 #pragma clang diagnostic pop
 
     os_activity_initiate("-[SRRecorderControl canEndRecordingWithObjectValue:]", OS_ACTIVITY_FLAG_DEFAULT, ^{
-        if ([self isRunningOnSequoia] && ![SRShortcut sequoiaValidModifiers:aShortcut.modifierFlags])
+        if ([self isAtLeastMacOS15] && ![SRShortcut macos15ValidModifiers:aShortcut.modifierFlags])
         {
             os_log_debug(OS_LOG_DEFAULT, "Modifiers %lu rejected on Sequoia", aShortcut.modifierFlags);
             result = NO;
@@ -1805,7 +1805,7 @@ static void *_SRStyleGuideObservingContext = &_SRStyleGuideObservingContext;
                     // Do not end editing and allow the client to make another attempt.
                     [self playAlert];
 
-                    if ([self isRunningOnSequoia] && ![newObjectValue isValidOnSequoia] && !_hasSequoiaAlertBeenShown)
+                    if ([self isAtLeastMacOS15] && ![newObjectValue isValidOnMacos15] && !_hasSequoiaAlertBeenShown)
                         [self showSequoiaAlert];
                 }
 

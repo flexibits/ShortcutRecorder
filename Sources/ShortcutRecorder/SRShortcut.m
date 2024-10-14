@@ -205,7 +205,7 @@ SRShortcutKey const SRShortcutKeyCharactersIgnoringModifiers = @"charactersIgnor
 
 #pragma mark Non-initializer class methods
 
-+ (BOOL)sequoiaValidModifiers:(NSEventModifierFlags)modifierFlags
++ (BOOL)macos15ValidModifiers:(NSEventModifierFlags)modifierFlags
 {
     BOOL noModifiers = (modifierFlags == 0);
     BOOL hasCtrlOrCommand = (modifierFlags & (NSEventModifierFlagControl|NSEventModifierFlagCommand));
@@ -234,9 +234,9 @@ SRShortcutKey const SRShortcutKeyCharactersIgnoringModifiers = @"charactersIgnor
 // A shortcut is invalid on Sequoia if it contains ONLY shift or option modifiers.
 // no modifiers is fine, but if any modifer is present, it must contain cmd and/or ctrl
 // https://developer.apple.com/forums/thread/763878?answerId=804374022#804374022
-- (BOOL) isValidOnSequoia
+- (BOOL)isValidOnMacos15
 {
-    return [[self class] sequoiaValidModifiers:self.modifierFlags];
+    return [[self class] macos15ValidModifiers:self.modifierFlags];
 }
 
 #pragma mark Methods

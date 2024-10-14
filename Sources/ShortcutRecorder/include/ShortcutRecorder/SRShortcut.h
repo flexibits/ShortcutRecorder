@@ -121,10 +121,10 @@ NS_SWIFT_NAME(Shortcut)
 - (instancetype)init NS_UNAVAILABLE;
 
 /*!
- A convenient way to ask if the shortcut modifiers are valid on Sequoia without creating a shortcut
+ A convenient way to ask if the shortcut modifiers are valid on Sequoia (or later) without creating a shortcut
  @seealso SRShortcut/isValidOnSequoia
  */
-+ (BOOL)sequoiaValidModifiers:(NSEventModifierFlags)modifierFlags;
++ (BOOL)macos15ValidModifiers:(NSEventModifierFlags)modifierFlags;
 
 /*!
  A key code such as 0 ('a').
@@ -132,9 +132,9 @@ NS_SWIFT_NAME(Shortcut)
 @property (readonly) SRKeyCode keyCode;
 
 /*!
- Does the shortcut contain modifiers other than shift and option?  Sequoia requires that.
+ Does the shortcut contain modifiers other than shift and option?  Sequoia (or later) requires that.
  */
-@property (readonly) BOOL isValidOnSequoia;
+@property (readonly) BOOL isValidOnMacos15;
 
 /*!
  Modifier flags such as NSEventModifierFlagCommand | NSEventModifierFlagOption.
