@@ -955,7 +955,7 @@ static void *_SRStyleGuideObservingContext = &_SRStyleGuideObservingContext;
     NSAlert *sequoiaAlert = [[NSAlert alloc] init];
     
     [sequoiaAlert setMessageText:SRLoc(@"Keyboard shortcut not allowed")];
-    [sequoiaAlert setInformativeText:SRLoc(@"Keyboard shortcuts must include the Command or Control keys. Keyboard shortcuts with only the Option or Shift keys are not allowed by macOS.")];
+    [sequoiaAlert setInformativeText:SRLoc(@"Keyboard shortcuts with only the Option and Shift keys are not allowed by macOS.")];
     [sequoiaAlert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse returnCode) {
         self->_hasSequoiaAlertBeenShown = YES;
     }];

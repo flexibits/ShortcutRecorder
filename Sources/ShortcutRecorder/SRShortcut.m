@@ -208,9 +208,15 @@ SRShortcutKey const SRShortcutKeyCharactersIgnoringModifiers = @"charactersIgnor
 + (BOOL)macos15ValidModifiers:(NSEventModifierFlags)modifierFlags
 {
     BOOL noModifiers = (modifierFlags == 0);
-    BOOL hasCtrlOrCommand = ((modifierFlags & (NSEventModifierFlagControl|NSEventModifierFlagCommand)) != 0);
-    
-    return noModifiers || hasCtrlOrCommand;
+    BOOL hasCtrlOrCommand = ((modifierFlags & (NSEventModifierFlagControl | NSEventModifierFlagCommand)) != 0);
+
+    if (@available(macOS 15.2, *)) {
+        BOOL hasOptionOnly = modifierFlags == NSEventModifierFlagOption; // Option-only shortcuts are allowed on macOS 15.2 again
+
+        return noModifiers || hasCtrlOrCommand || hasOptionOnly;
+    } else {
+        return noModifiers || hasCtrlOrCommand;
+    }
 }
 
 #pragma mark Properties
