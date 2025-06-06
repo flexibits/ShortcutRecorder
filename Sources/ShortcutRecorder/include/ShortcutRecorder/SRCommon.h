@@ -328,7 +328,7 @@ NS_INLINE NSEventModifierFlags SRCoreGraphicsToCocoaFlags(CGEventFlags aCoreGrap
 /*!
  Return Bundle where resources can be found.
 
- @throws NSInternalInconsistencyException
+ @throws NSInternalInconsistencyException Thrown if bundle cannot be found
 
  @discussion Throws NSInternalInconsistencyException if bundle cannot be found.
  */
