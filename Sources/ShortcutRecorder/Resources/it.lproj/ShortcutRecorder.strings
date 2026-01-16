@@ -2,28 +2,28 @@
 "Space" = "Spazio";
 
 /* VoiceOver type of the object recorded by the control */
-"Shortcut" = "Abbreviazione";
+"Shortcut" = "Scorciatoia";
 
 /* VoiceOver value for the value-less control */
 "Not set" = "Non impostato";
 
 /* Tooltip for the cancel button when the control has a value */
-"Use old shortcut" = "Usa vecchia abbreviazione";
+"Use old shortcut" = "Usa vecchia scorciatoia";
 
 /* Tooltip for the cancel button when the control has no value */
 "Cancel recording" = "Annulla la registrazione";
 
 /* Tooltip for the clear button */
-"Delete current shortcut" = "Elimina l'abbreviazione corrente";
+"Delete current shortcut" = "Elimina la scorciatoia corrente";
 
 /* Label and tooltip for the recording mode */
 "Press keys now" = "Premi tasti adesso";
 
 /* Label for the value-less control */
-"Record Shortcut" = "Registra abbreviazione";
+"Record Shortcut" = "Registra scorciatoia";
 
 /* Tooltip for the normal mode */
-"Click to record shortcut" = "Clicca per registrare l'abbreviazione";
+"Click to record shortcut" = "Clicca per registrare la scorciatoia";
 
 /* Value for the NSLocalizedFailureReasonErrorKey key of validator's error */
 "The \"%@\" shortcut can't be used!" = "La combinazione di tasti “%@“ non può essere usata!";
@@ -38,16 +38,16 @@
 "The \"%@\" shortcut can't be used because it's already used by a system-wide keyboard shortcut. If you really want to use this shortcut, most shortcuts can be changed in the Keyboard panel in System Preferences." = "La combinazione di tasti “%@“ non può essere usata perché già usata come abbreviazione di sistema. Se vuoi davvero usare questa combinazione di tasti, puoi modificare la maggior parte delle abbreviazioni nel pannello Tastiera delle Preferenze di Sistema.";
 
 /* Value for the NSLocalizedDescriptionKey key of validator's menu error */
-"The \"%@\" shortcut can't be used because it's already used by the \"%@\" menu item." = "La combinazione di tasti “%@“ non può essere usata perché è già usata dall'elemento del menu “%@“.";
+"The \"%@\" shortcut can't be used because it's already used by the \"%@\" menu item." = "La combinazione di tasti “%@“ non può essere usata perché è già usata dall’elemento del menu “%@“.";
 
 /* Accessibility name of the Command modifier key */
-"Command" = "Commando";
+"Command" = "Command";
 
 /* VoiceOver name of the Option modifier key */
-"Option" = "Opzione";
+"Option" = "Option";
 
 /* VoiceOver name of the Shift modifier key */
-"Shift" = "Maiuscole";
+"Shift" = "Maiusc";
 
 /* VoiceOver name of the Control modifier key */
 "Control" = "Control";
