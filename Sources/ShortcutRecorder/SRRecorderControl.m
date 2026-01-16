@@ -1162,7 +1162,7 @@ static void *_SRStyleGuideObservingContext = &_SRStyleGuideObservingContext;
 
 - (NSString *)accessibilityHelp
 {
-    return nil;
+    return SRLoc(@"Click to record shortcut");
 }
 
 - (NSAccessibilityRole)accessibilityRole
