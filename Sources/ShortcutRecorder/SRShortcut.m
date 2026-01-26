@@ -208,15 +208,11 @@ SRShortcutKey const SRShortcutKeyCharactersIgnoringModifiers = @"charactersIgnor
 + (BOOL)macos15ValidModifiers:(NSEventModifierFlags)modifierFlags
 {
     BOOL noModifiers = (modifierFlags == 0);
-    BOOL hasCtrlOrCommand = ((modifierFlags & (NSEventModifierFlagControl | NSEventModifierFlagCommand)) != 0);
+    BOOL hasCtrlOrCommandOrOption = ((modifierFlags & (NSEventModifierFlagControl | NSEventModifierFlagCommand | NSEventModifierFlagOption)) != 0);
 
-    if (@available(macOS 15.2, *)) {
-        BOOL hasOptionOnly = modifierFlags == NSEventModifierFlagOption; // Option-only shortcuts are allowed on macOS 15.2 again
-
-        return noModifiers || hasCtrlOrCommand || hasOptionOnly;
-    } else {
-        return noModifiers || hasCtrlOrCommand;
-    }
+    // macOS 15.2 allows control, command, or option
+    // https://developer.apple.com/forums/thread/763878
+    return noModifiers || hasCtrlOrCommandOrOption;
 }
 
 #pragma mark Properties
@@ -237,9 +233,6 @@ SRShortcutKey const SRShortcutKeyCharactersIgnoringModifiers = @"charactersIgnor
     return d;
 }
 
-// A shortcut is invalid on Sequoia if it contains ONLY shift or option modifiers.
-// no modifiers is fine, but if any modifer is present, it must contain cmd and/or ctrl
-// https://developer.apple.com/forums/thread/763878?answerId=804374022#804374022
 - (BOOL)isValidOnMacos15
 {
     return [[self class] macos15ValidModifiers:self.modifierFlags];
