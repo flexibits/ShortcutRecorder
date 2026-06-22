@@ -345,7 +345,7 @@ static void *_SRShortcutActionContext = &_SRShortcutActionContext;
         if ([newShortcut isKindOfClass:NSDictionary.class])
             newShortcut = [SRShortcut shortcutWithDictionary:(NSDictionary *)newShortcut];
         else if ([newShortcut isKindOfClass:NSData.class])
-            newShortcut = [NSKeyedUnarchiver unarchiveObjectWithData:(NSData *)newShortcut];
+            newShortcut = [NSKeyedUnarchiver unarchivedObjectOfClass:SRShortcut.class fromData:(NSData *)newShortcut error:NULL];
         else if ((NSNull *)newShortcut == NSNull.null)
             newShortcut = nil;
 

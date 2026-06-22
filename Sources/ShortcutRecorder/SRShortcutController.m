@@ -85,14 +85,16 @@ static void _onSelectedKeyboardInputSourceChange(CFNotificationCenterRef aCenter
 {
     if (self.content == nil)
     {
-        _keyEquivalent = (id)NSNoSelectionMarker;
-        _keyEquivalentModifierMask = (id)NSNoSelectionMarker;
-        _literalKeyCode = (id)NSNoSelectionMarker;
-        _symbolicKeyCode = (id)NSNoSelectionMarker;
-        _literalASCIIKeyCode = (id)NSNoSelectionMarker;
-        _symbolicASCIIKeyCode = (id)NSNoSelectionMarker;
-        _literalModifierFlags = (id)NSNoSelectionMarker;
-        _symbolicModifierFlags = (id)NSNoSelectionMarker;
+        id noSelectionMarker = (id)NSBindingSelectionMarker.noSelectionMarker;
+
+        _keyEquivalent = noSelectionMarker;
+        _keyEquivalentModifierMask = noSelectionMarker;
+        _literalKeyCode = noSelectionMarker;
+        _symbolicKeyCode = noSelectionMarker;
+        _literalASCIIKeyCode = noSelectionMarker;
+        _symbolicASCIIKeyCode = noSelectionMarker;
+        _literalModifierFlags = noSelectionMarker;
+        _symbolicModifierFlags = noSelectionMarker;
     }
 }
 

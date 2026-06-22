@@ -1000,11 +1000,6 @@ static void *_SRStyleGuideObservingContext = &_SRStyleGuideObservingContext;
     [boundObject setValue:aValue forKeyPath:boundKeyPath];
 }
 
-- (void)controlTintDidChange:(NSNotification *)aNotification
-{
-    [self scheduleControlViewAppearanceDidChange:aNotification];
-}
-
 - (void)accessibilityDisplayOptionsDidChange:(NSNotification *)aNotification
 {
     [self scheduleControlViewAppearanceDidChange:aNotification];
@@ -1532,9 +1527,6 @@ static void *_SRStyleGuideObservingContext = &_SRStyleGuideObservingContext;
         [NSNotificationCenter.defaultCenter removeObserver:self
                                                       name:NSWindowDidResignKeyNotification
                                                     object:self.window];
-        [NSNotificationCenter.defaultCenter removeObserver:self
-                                                      name:NSControlTintDidChangeNotification
-                                                    object:NSApp];
         [NSWorkspace.sharedWorkspace.notificationCenter removeObserver:self
                                                                   name:NSWorkspaceAccessibilityDisplayOptionsDidChangeNotification
                                                                 object:nil];
@@ -1546,10 +1538,6 @@ static void *_SRStyleGuideObservingContext = &_SRStyleGuideObservingContext;
                                                selector:@selector(endRecording)
                                                    name:NSWindowDidResignKeyNotification
                                                  object:aWindow];
-        [NSNotificationCenter.defaultCenter addObserver:self
-                                               selector:@selector(controlTintDidChange:)
-                                                   name:NSControlTintDidChangeNotification
-                                                 object:NSApp];
         [NSWorkspace.sharedWorkspace.notificationCenter addObserver:self
                                                            selector:@selector(accessibilityDisplayOptionsDidChange:) name:NSWorkspaceAccessibilityDisplayOptionsDidChangeNotification
                                                              object:nil];

@@ -148,7 +148,7 @@ NSUserInterfaceLayoutDirection SRRecorderControlStyleComponentsLayoutDirectionTo
     if (aView)
         effectiveSystemAppearance = aView.effectiveAppearance.name;
     else
-        effectiveSystemAppearance = NSAppearance.currentAppearance.name;
+        effectiveSystemAppearance = NSAppearance.currentDrawingAppearance.name;
 
     __auto_type appearance = SRRecorderControlStyleComponentsAppearanceFromSystem(effectiveSystemAppearance);
     __auto_type tint = SRRecorderControlStyleComponentsTintFromSystem(NSColor.currentControlTint);
